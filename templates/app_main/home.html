@@ -1,0 +1,288 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block body %}
+{% include 'app_post/modals/edit_post.html' %}
+<div class="home-container">
+    <div class="row w-100 m-0">
+        <div class="col-md-3">
+            <div class="sidebar-container">
+                <a class="site-logo fw-bold" href="{% url 'app_main:home' %}">
+                    <img src="{% static 'assets/images/mountain-logo-w.png' %}"> MntnrsHub.
+                </a>
+
+                <div class="sidebar-content">
+                    <div class="profile-details">
+                        <div class="profile-img">
+                            <span class="m-auto">{{request.session.user.first_name.0|upper}}{{request.session.user.last_name.0|upper}}</span>
+                        </div>
+                        <div class="profile-name">
+                            <span class="d-block text-title">
+                                {{request.session.user.first_name|title}} {{request.session.user.last_name|title}}
+                            </span>
+                            <small class="text-black-50">{{request.session.user.email_address}}</small>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-buttons mt-5">
+                        <a class="btn btn-secondary w-100" href="{% url 'app_main:logout' %}"><i class='bx bx-fw bx-log-out'></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="post-container">
+                <div class="row w-100 gx-0">
+                    <div class="col-12">
+                        <div class="post-create post-card">
+                            <form id="post_form" method="post">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="text-title mb-2">What's on your mind?</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea maxlength="255" class="form-control" name="new_post"></textarea>
+                                    </div>
+                                    <div class="col-12 col-md-3 mt-2">
+                                        <select class="form-select mt-2 w-auto" name="visibility">
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-9 mt-3 text-end">
+                                        <button class="btn btn-secondary" type="button" id="discard_post">Cancel</button>
+                                        <button class="btn btn-primary" type="submit">Publish Post</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1 gy-3" id="post_cont">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        autosize($("textarea[name=new_post]"));
+        loadPostLoader();
+        loadPosts();
+
+        $("textarea[name=new_post]").on("keyup", function(){
+            let _this = $(this);
+            let _form = $("#post_form");
+
+            if(_this.val().length > 0)
+                _form.find("#discard_post").show();
+            else
+                _form.find("#discard_post").hide();
+        });
+
+        // DISCARD POST
+        $("#discard_post").on("click", function(){
+            Swal.fire({
+                title: 'Discard Post?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#338d90',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Confirm'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $("#post_form").trigger("reset");
+                    $(this).hide();
+                }
+            })
+        });
+
+        // PUBLISH POST
+        $("#post_form").on("submit", function(e){
+            e.preventDefault();
+            let data = new FormData($(this)[0]);
+
+            $.ajax({
+                url: "{% url 'app_post:post_post' %}",
+                type: "post",
+                data: data,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': "{{csrf_token}}"},
+                success: function(response){
+                    if(response.success){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Posted Successful!',
+                            text: response.message,
+                            confirmButtonText: 'Login',
+                            confirmButtonColor: "#338d90",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $("#post_form").trigger("reset");
+                                loadPostLoader();
+                                loadPosts();
+                            }
+                        });
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: "#338d90",
+                        });
+                    }
+                }
+            });
+        });
+
+        // EDIT POST
+        $(document).on("click", ".edit-post", function(){
+            let postId = $(this).attr("data-id");
+
+            $("#edit_post_cont").load("{% url 'app_post:post_details' %}?id=" + postId, function(){
+                $("#edit_post_modal").modal("show");
+            });
+        });
+
+        // SUBMISSION OF POST UPDATE
+        $(document).on("submit", "#edit_form", function(e){
+            e.preventDefault();
+            let data = new FormData($(this)[0]);
+
+            $.ajax({
+                url: "{% url 'app_post:edit_post' %}",
+                type: "post",
+                data: data,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': "{{csrf_token}}"},
+                success: function(response){
+                    if(response.success){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Update Successful!',
+                            text: response.message,
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: "#338d90",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $("#edit_post_modal").modal("hide");
+                                loadPostLoader();
+                                loadPosts();
+                            }
+                        });
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: "#338d90",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $("#edit_post_modal").modal("hide");
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        // DELETE POST
+        $(document).on("click", ".delete-post", function(){
+            let postId = $(this).attr("data-id");
+
+            Swal.fire({
+                title: 'Delete Post?',
+                text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#338d90',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Confirm'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let data = {
+                        post_id: postId
+                    }
+
+                    $.ajax({
+                        url: "{% url 'app_post:delete_post' %}",
+                        type: "post",
+                        data: data,
+                        headers: {'X-CSRFToken': "{{csrf_token}}"},
+                        success: function(response){
+                            if(response.success){
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Delete Successful!',
+                                    text: response.message,
+                                    confirmButtonText: 'Okay',
+                                    confirmButtonColor: "#338d90",
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        loadPostLoader();
+                                        loadPosts();
+                                    }
+                                });
+                            }
+                            else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.message,
+                                    confirmButtonText: 'Okay',
+                                    confirmButtonColor: "#338d90",
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        loadPostLoader();
+                                        loadPosts();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        });
+    });
+
+    // POST SUBPAGING
+    function loadPosts(){
+        let _container = $("#post_cont");
+
+        _container.load("{% url 'app_post:post_list' %}");
+    }
+
+    // POST LOADER
+    function loadPostLoader(){
+        let _container = $("#post_cont");
+        let loader = '<div class="post-loader">'+
+                        '<div class="col-12">'+
+                            '<div class="post-item post-card">'+
+                                '<div class="profile-details">'+
+                                    '<div class="profile-img">'+
+                                        '<span class="m-auto"></span>'+
+                                    '</div>'+
+                                    '<div class="profile-name">'+
+                                        '<span class="d-block text-title text-loader">John Doe</span>'+
+                                        '<small class="text-loader"><i class="bx bx-fw bx-globe"></i> Just now</small>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="post-content text-loader">This is a post.</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>';
+        _container.html(loader);
+    }
+</script>
+{% endblock %}

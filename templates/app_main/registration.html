@@ -1,0 +1,180 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="sign-container">
+    <div class="row g-0 w-100">
+        <div class="col-12 col-md-5 p-3" id="login_form">
+            <a class="site-logo" href="{% url 'app_main:home' %}">
+                <img src="{% static 'assets/images/mountain-logo-w.png' %}">
+            </a>
+            <div class="form-container">
+                <form id="form_register" method="post">
+                    <div class="row g-3" id="registration_form_1">
+                        <div class="col-12 mt-0 mb-3">
+                            <label class="text-header d-block">Sign Up to MntnrsHub.</label>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" placeholder="Username" name="username" required>
+                        </div>
+                        <div class="col-12">
+                            <input type="password" class="form-control" placeholder="Password" name="password" required>
+                        </div>
+                        <div class="col-12">
+                            <input type="password" class="form-control" placeholder="Confirm Password" name="password_confirm" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <a href="{% url 'app_main:login' %}" class="fw-bold text-black-50">Login</a>
+                                </div>
+                                <div class="col text-end">
+                                    <button type="button" class="btn btn-primary btn-next">Next <i class='bx bx-fw bx-chevron-right'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3" id="registration_form_2" style="display: none;">
+                        <div class="col-12 mt-0 mb-3">
+                            <label class="text-header d-block">Tell Us About Yourself.</label>
+                        </div>
+                        <div class="col-12">
+                            <input type="email" class="form-control" placeholder="Email Address" name="email" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <input type="text" class="form-control" placeholder="First Name" name="firstname" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <input type="text" class="form-control" placeholder="Last Name" name="lastname" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <input type="text" class="form-control" placeholder="Middle Name" name="middlename">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <select class="form-select" name="gender" required>
+                                <option value="" disabled selected>Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <input type="number" class="form-control" placeholder="Age" name="age" min="1" max="200" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <a href="javascript:void(0);" class="fw-bold text-black-50 btn-back"><i class='bx bx-fw bx-chevron-left'></i> Back</a>
+                                </div>
+                                <div class="col text-end">
+                                    <button type="submit" class="btn btn-primary">Create Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="login-details">
+                    <label class="text-subtitle text-black-50">Leave No Trace.</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-7 p-3" id="login_content">
+            <div class="content">
+                <label class="text-header d-block">MntnrsHub.</label>
+                <label class="text-subtitle">Mountain is calling, we must go.</label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        // REGISTRATION PAGE 2
+        $(".btn-next").on("click", function(){
+            let username = $("input[name=username]").val();
+            let password = $("input[name=password]").val();
+            let password_confirm = $("input[name=password_confirm]").val();
+
+            if(username == "" || password == "" || password_confirm == ""){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'All fields are required.',
+                    confirmButtonText: 'Okay',
+                    confirmButtonColor: "#338d90",
+                });
+                return false;
+            }
+
+            if(password !== password_confirm){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Password do not match.',
+                    confirmButtonText: 'Okay',
+                    confirmButtonColor: "#338d90",
+                });
+                $("input[name=password]").val("");
+                $("input[name=password_confirm]").val("");
+                $("input[name=password]").focus();
+                return false;
+            }
+
+            $("#registration_form_1").hide();
+            $("#registration_form_2").show();
+        });
+
+        // REGISTRATION PAGE 1
+        $(".btn-back").on("click", function(){
+            $("#registration_form_1").show();
+            $("#registration_form_2").hide();
+        });
+
+        // REGISTRATION SUBMISSION
+        $("#form_register").on("submit", function(e){
+            e.preventDefault();
+            let _this = $(this);
+            _this.find("button[type=submit]").prop("disabled", true);
+            _this.find("button[type=submit]").html("Creating account...");
+            let data = new FormData($(this)[0]);
+
+            $.ajax({
+                url: "{% url 'app_main:post_register' %}",
+                type: "post",
+                data: data,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': "{{csrf_token}}"},
+                success: function(response){
+                    if(response.success){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registration Success!',
+                            text: response.message,
+                            confirmButtonText: 'Login',
+                            confirmButtonColor: "#338d90",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href="{% url 'app_main:login' %}";
+                            }
+                        });
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: "#338d90",
+                        });
+                    }
+
+                    _this.find("button[type=submit]").prop("disabled", false);
+                    _this.find("button[type=submit]").html("Create Account");
+                },
+            });
+        });
+    });
+</script>
+{% endblock %}

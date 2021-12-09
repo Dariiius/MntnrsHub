@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="sign-container">
+    <div class="row g-0 w-100">
+        <div class="col-12 col-md-5 p-3" id="login_form">
+            <a class="site-logo" href="{% url 'app_main:home' %}">
+                <img src="{% static 'assets/images/mountain-logo-w.png' %}">
+            </a>
+            <div class="form-container">
+                <form id="form_login" method="post">
+                    <div class="row g-3">
+                        <div class="col-12 mt-0 mb-3">
+                            <label class="text-header d-block">Login to MntnrsHub.</label>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" placeholder="Username" name="username" required>
+                        </div>
+                        <div class="col-12">
+                            <input type="password" class="form-control" placeholder="Password" name="password" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <a href="{% url 'app_main:registration' %}" class="fw-bold text-black-50">Register</a>
+                                </div>
+                                <div class="col text-end">
+                                    <button type="submit" class="btn btn-primary">Sign In</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="login-details">
+                    <label class="text-subtitle text-black-50">Leave No Trace.</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-7 p-3" id="login_content">
+            <div class="content">
+                <label class="text-header d-block">MntnrsHub.</label>
+                <label class="text-subtitle">Mountain is calling, we must go.</label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        // LOGIN SUBMISSION
+        $("#form_login").on("submit", function(e){
+            e.preventDefault();
+            let data = new FormData($(this)[0]);
+
+            $.ajax({
+                url: "{% url 'app_main:post_login' %}",
+                type: "post",
+                data: data,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': "{{csrf_token}}"},
+                success: function(response){
+                    if(response.success){
+                        location.href="{% url 'app_main:home' %}";
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'Try again',
+                            confirmButtonColor: "#338d90",
+                        });
+                    }
+                },
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+<form id="edit_form" method="post">
+  <div class="row">
+    <div class="col-12">
+      <input type="hidden" value="{{post.id}}" name="post_id">
+      <textarea maxlength="255" class="form-control" name="post_content" rows="4">{{post.content}}</textarea>
+    </div>
+    <div class="col-12 col-md-3 mt-2">
+      <select class="form-select mt-2 w-auto" name="visibility">
+        <option value="public" {% if post.visibility_status == 'public' %}selected{% endif %}>Public</option>
+        <option value="private" {% if post.visibility_status == 'private' %}selected{% endif %}>Private</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-9 mt-3 text-end">
+      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn btn-primary" type="submit">Update Post</button>
+    </div>
+  </div>
+</form>

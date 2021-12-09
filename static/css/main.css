@@ -1,0 +1,189 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    width: 100%;
+    height: 100%;
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #ededed;
+    color: #3c3c3c;
+}
+
+.container-fluid{
+    height: 100%;
+    width: 100%;
+    padding: 0;
+}
+
+#login_content{
+    background-image: url('../assets/images/login-wallpaper-6.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 100vh;
+}
+
+#login_content > .content{
+    color: white;
+    margin-top: 2rem;
+    margin-left: 2rem;
+    display: block;
+    position: relative;
+}
+
+#login_content > .content::before{
+    content: "";
+    width: 50px;
+    height: 2px;
+    background-color: #fff;
+    display: block;
+    position: absolute;
+    bottom: -1.5rem;
+}
+
+#login_content > .content .text-header{
+    font-size: 48px;
+}
+
+.site-logo{
+    color: inherit !important;
+    font-size: 18px;
+}
+
+.site-logo img{
+    width: 70px;
+    filter: invert(18%) sepia(35%) saturate(786%) hue-rotate(132deg) brightness(55%) contrast(98%);
+}
+
+.sign-container .form-container{
+    height: calc(90% - 70px);
+    display: flex;
+    flex-direction: column;
+}
+
+.sign-container .form-container > form{
+    margin: auto;
+    width: 100%;
+    max-width: 500px;
+}
+
+.sign-container .form-container > .login-details{
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 500px;
+}
+
+.sidebar-container{
+    padding: 1rem 0;
+}
+
+.profile-img{
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    background-color: #338d90;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 100%;
+    display: flex;
+    font-size: 13px;
+    margin-right: .75rem;
+}
+
+.sidebar-content{
+    margin-top: 2rem;
+    margin-left: 1rem;
+}
+
+.profile-details{
+    display: flex;
+    align-items: center;
+}
+
+.profile-name{
+    display: block;
+    line-height: 1.2;
+}
+
+.post-container{
+    padding: 1.5rem 1rem;
+}
+
+.post-create textarea, #edit_form textarea{
+    resize: none;
+    max-height: 100px;
+}
+
+.post-card{
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.post-content{
+    margin-top: 1.5rem;
+}
+
+.post-item .bx{
+    margin-top: -1px !important;
+}
+
+#post_form #discard_post{
+    display: none;
+}
+
+#post_form select[name=visibility], #edit_form select[name=visibility]{
+    font-size: 12px;
+    line-height: 1 !important;
+}
+
+#post_form select[name=visibility] option, #edit_form select[name=visibility] option{
+    font-size: 14px;
+}
+
+.post-loader .profile-img{
+    background-color: #dddddd;
+}
+
+.post-loader .text-loader{
+    background-color: #dddddd;
+    color: #dddddd;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.post-item .profile-name{
+    flex: auto;
+}
+
+.post-item .dropdown > .dropdown-toggle::after{
+    display: none;
+}
+
+.post-item .dropdown > .dropdown-toggle .bx{
+    width: max-content;
+    font-size: 20px;
+}
+
+.modal-header{
+    border: unset !important;
+}
+
+.modal-header a{
+    font-size: 18px;
+    color: #3c3c3c;
+}
+
+.modal-header a > .bx{
+    margin-top: -1px !important;
+}
+
+.modal-footer{
+    border: unset !important;
+}

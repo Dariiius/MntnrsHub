@@ -1,0 +1,27 @@
+a{
+    text-decoration: none !important;
+}
+
+input, select{
+    line-height: 2 !important;
+}
+
+.text-header{
+    font-size: 28px;
+    font-weight: 500;
+}
+
+.text-title{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.btn-primary{
+    background-color: #338d90;
+    border-color: #338d90;
+}
+
+.btn-primary:hover{
+    background-color: #46a2a5;
+    border-color: #46a2a5;
+}

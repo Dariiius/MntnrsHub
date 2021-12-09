@@ -1,0 +1,38 @@
+{% load humanize %}
+
+{% for post in posts %}
+    <div class="col-12">
+        <div class="post-item post-card">
+            <div class="profile-details">
+                <div class="profile-img">
+                    <span class="m-auto">{{post.creator.first_name.0|upper}}{{post.creator.last_name.0|upper}}</span>
+                </div>
+                <div class="profile-name">
+                    <span class="d-block text-title">
+                        {{post.creator.first_name|title}} {{post.creator.last_name|title}}
+                    </span>
+                    {% if post.visibility_status == 'public' %}
+                    <small class="text-black-50"><i class='bx bx-fw bx-globe' ></i> {{post.date_posted|naturaltime}}</small>
+                    {% else %}
+                    <small class="text-black-50"><i class='bx bx-fw bx-lock-alt' ></i> {{post.date_posted|naturaltime}}</small>
+                    {% endif %}
+                </div>
+
+                {% if post.creator.user_id == request.session.user.user_id %}
+                <div class="dropdown">
+                    <a class="dropdown-toggle text-black-50" type="button" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class='bx bx-fw bx-dots-vertical-rounded'></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item edit-post" data-id="{{post.id}}" href="javascript:void(0);">Edit</a></li>
+                        <li><a class="dropdown-item delete-post" data-id="{{post.id}}" href="javascript:void(0);">Delete</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="post-content">
+                {{post.content}}
+            </div>
+        </div>
+    </div>
+{% endfor %}
